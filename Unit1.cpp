@@ -8,19 +8,26 @@
 #pragma package(smart_init)
 #pragma resource "*.fmx"
 TForm1 *Form1;
+//Переменные, необходимые для работы приложения
 int x,y,i,p,p1,p2,a[8],b[8],bot,botrandom;
+//Переменная определяющая определенность хода программы
 bool hotbot=true;
 //---------------------------------------------------------------------------
+//Главная форма (основная и единственная)
 __fastcall TForm1::TForm1(TComponent* Owner)
 	: TForm(Owner)
 {
 }
 //---------------------------------------------------------------------------
+//Кнопка отвечающая за открытие игрового окна на двух игроков
 void __fastcall TForm1::Button_Player2Click(TObject *Sender)
 {
 Player2->Visible=true;
 }
 //---------------------------------------------------------------------------
+//Одна из клеток игрового поля в режиме на двух игроков
+//Проверка состояния переменной x, если она нулевая, то значит отрисовывать крестик(по нажатию на поле),
+//в противном случае отрисовывается нолик
 void __fastcall TForm1::P2Place_0Click(TObject *Sender)
 {
 if (x==0) {x=1;P2Place_0->Bitmap=krest->Bitmap;a[0]=1;} else {x=0;P2Place_0->Bitmap=nol->Bitmap;a[0]=2;}
@@ -82,8 +89,10 @@ void __fastcall TForm1::P2Place_8Click(TObject *Sender)
 if (x==0) {x=1;P2Place_8->Bitmap=krest->Bitmap;a[8]=1;} else {x=0;P2Place_8->Bitmap=nol->Bitmap;a[8]=2;}
 Timer2->Enabled=true;
 }
+//Окончание игровых полей (выше все однотипное, смвсла писать одно и тоже не вижу)
 //---------------------------------------------------------------------------
-
+//Таймер 2 - отвечает за определения победителя в раунде (проверка идет по 8 разным вариантам
+//(3 горизонтальных линии, 3 вертикальных и 2 диагонали))
 void __fastcall TForm1::Timer2Timer(TObject *Sender)
 {
 //XXX
@@ -105,11 +114,12 @@ if (a[2]==2&&a[5]==2&&a[8]==2) {Timer1->Enabled=true;line3->Visible=true;p2++;}
 if (a[0]==2&&a[4]==2&&a[8]==2) {Timer1->Enabled=true;line7->Visible=true;p2++;}
 if (a[2]==2&&a[4]==2&&a[6]==2) {Timer1->Enabled=true;line8->Visible=true;p2++;}
 //XO
+//Активация первого таймера и деактивация второго, по достижению ничьей
 if (a[0]!=0&&a[1]!=0&&a[2]!=0&&a[3]!=0&&a[4]!=0&&a[5]!=0&&a[6]!=0&&a[7]!=0&&a[8]!=0) {Timer1->Enabled=true;}
 Timer2->Enabled=false;
 }
 //---------------------------------------------------------------------------
-
+//Первый таймер отвечает за обнуление линий победы, обнуление крестиков, ноликов на поле боя
 void __fastcall TForm1::Timer1Timer(TObject *Sender)
 {
 //Menu->Visible=true;Player2->Visible=false;
@@ -132,10 +142,13 @@ P2Place_6->Bitmap=NULL;
 P2Place_7->Bitmap=NULL;
 P2Place_8->Bitmap=NULL;
 //
+//Обнуление массива крестиков и ноликов
 for (i=0;i<9; i++) {a[i]=0;}
 //
+//обнуление переменных отвечающих за очередность хода
 x=0;y=0;
 //XXX
+//счет побед
 if (p1==1) {Score_p1->Visible=true;Score_p1->Bitmap=Number1->Bitmap;}
 if (p1==2) {Score_p1->Bitmap=Number2->Bitmap;}
 if (p1==3) {Score_p1->Bitmap=Number3->Bitmap;}
@@ -153,14 +166,14 @@ if (p2==6) {Score_p1->Visible=false;Score_p2->Visible=false;WinnerOOO->Visible=t
 Timer1->Enabled=false;
 }
 //---------------------------------------------------------------------------
-
+//Задание начального положения переменных (параметры задаються при создании формы)
 void __fastcall TForm1::FormCreate(TObject *Sender)
 {
 x=0;y=0;p=0;p1=0;p2=0;
 for (i=0;i<9; i++) {a[i]=0;}
 }
 //---------------------------------------------------------------------------
-
+//Результат победы крестиков и ноликов
 void __fastcall TForm1::WinnerOOOClick(TObject *Sender)
 {
 Menu->Visible=true;
@@ -180,7 +193,10 @@ WinnerXXX->Visible=false;
 p1=0;p2=0;
 }
 //---------------------------------------------------------------------------
-
+//
+//Одна из клеток игрового поля в режиме на одного игрока
+//По нажатию на игровую клетку, отрисовывается крестик, после чего ход передается компьютеру
+//Мозг компьютера расположен в таймере четвертом
 void __fastcall TForm1::P1Place_0Click(TObject *Sender)
 {
 P1Place_0->Bitmap=krest->Bitmap;barrier->Visible=true;b[0]=1;Timer4->Enabled=true;
@@ -234,7 +250,7 @@ void __fastcall TForm1::P1Place_8Click(TObject *Sender)
 P1Place_8->Bitmap=krest->Bitmap;barrier->Visible=true;b[8]=1;Timer4->Enabled=true;
 }
 //---------------------------------------------------------------------------
-
+//Третий таймер отвечает за обнуление линий победы, обнуление крестиков, ноликов на поле боя
 void __fastcall TForm1::Timer3Timer(TObject *Sender)
 {
 //Menu->Visible=true;Player2->Visible=false;
@@ -258,6 +274,7 @@ P1Place_7->Bitmap=NULL;
 P1Place_8->Bitmap=NULL;
 //
 for (i=0;i<9; i++) {b[i]=0;}
+//Счет побед
 //XXX
 if (p1==1) {Score_p1->Visible=true;Score_p1->Bitmap=Number1->Bitmap;}
 if (p1==2) {Score_p1->Bitmap=Number2->Bitmap;}
@@ -276,7 +293,8 @@ if (p2==6) {Score_p2->Visible=false;Score_p1->Visible=false;WinnerOOO->Visible=t
 Timer3->Enabled=false;
 }
 //---------------------------------------------------------------------------
-
+//Таймер 4 отвечает за проверку победы крестиков
+//и в связи с результатом активацию либо 3-го либо 5-го таймера
 void __fastcall TForm1::Timer4Timer(TObject *Sender)
 {
 //XXX
@@ -293,7 +311,7 @@ if (b[0]!=0&&b[1]!=0&&b[2]!=0&&b[3]!=0&&b[4]!=0&&b[5]!=0&&b[6]!=0&&b[7]!=0&&b[8]
 Timer4->Enabled=false;
 }
 //---------------------------------------------------------------------------
-
+//Этот таймер отвечает за ход компьютера (Функция реализованна методом case)
 void __fastcall TForm1::Timer5Timer(TObject *Sender)
 {
 hotbot=true;
@@ -394,6 +412,7 @@ hotbot=false;
 }
 break;
 }
+//По окончании метода кейс, компьютер проверят поле на наличие победных комбинаций
 //OOO
 if (b[0]==2&&b[1]==2&&b[2]==2) {Timer3->Enabled=true;line4->Visible=true;p2++;}
 if (b[3]==2&&b[4]==2&&b[5]==2) {Timer3->Enabled=true;line5->Visible=true;p2++;}
@@ -407,7 +426,7 @@ barrier->Visible=false;Timer5->Enabled=false;Timer4->Enabled=false;
 }
 }
 //---------------------------------------------------------------------------
-
+//Кнопка отвечающая за открытие игрового окна на одного игрока
 void __fastcall TForm1::Button_Player1Click(TObject *Sender)
 {
 Player1->Visible=true;
